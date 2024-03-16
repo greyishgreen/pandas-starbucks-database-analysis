@@ -1,0 +1,26 @@
+import pandas as pd
+df=pd.read_json('https://raw.githubusercontent.com/mmcloughlin/starbucks/master/locations.json')
+me_lon=29.0237245
+me_lat=40.98914
+lon=df['longitude']
+lat=df['latitude']
+df['distance']=((me_lon-lon)**2 + (me_lat-lat)**2)**0.5
+df=df.sort_values(by=['distance'],ascending=True)
+n5=df.head(5)
+
+import folium
+m=folium.Map((me_lat,me_lon))
+folium.Circle(location=[me_lat,me_lon],radius=5000).add_to(m)
+for i in range(5):
+    folium.Marker(location=n5[['latitude','longitude']].iloc[i].values).add_to(m)
+m.save("map1.html")  # Save the map as an HTML file
+m
+
+#----
+from folium import plugins
+m=folium.Map((me_lat,me_lon))
+world=df[['latitude','longitude']]
+plugins.MarkerCluster(world).add_to(m)
+
+m.save("map.html")  # Save the map as an HTML file
+m
